@@ -184,6 +184,24 @@
       /@rgb"/>
   </xsl:function>
   
+  <!-- RYFFINE PATCH: tr:hks-to-rgb was missing from this pinned xslt-util
+       commit, though idml2xml's GenerateHubformat.xsl (mode
+       idml2xml:XML-Hubformat-add-properties) statically references it for
+       any Color element named "HKS ..." with @Space='LAB'. Since XSLT
+       resolves function existence at compile time, the absence of this
+       function broke compilation of every document, HKS swatch or not.
+       No local HKS->RGB mapping table exists in this codebase (unlike the
+       pantone-c-rgb-map/pantone-u-rgb-map above), so this shim returns an
+       empty sequence, which the caller already handles by falling back to
+       the swatch's original @ColorValue - safe, and matches the existing
+       fallback pattern used when tr:pantone-to-rgb has no map entry either.
+       Added 2026-07-12 while running the 64-document Barnes Migration
+       batch; see estimation-notes.md Session 7/8 for context. -->
+  <xsl:function name="tr:hks-to-rgb" as="xs:string?">
+    <xsl:param name="hks-name" as="xs:string?"/>
+    <xsl:sequence select="()"/>
+  </xsl:function>
+  
   <css:colors name="pantone-c-rgb-map">
     <css:color name="Yellow C" rgb="254 221 0"/>
     <css:color name="Yellow 012 C" rgb="255 215 0"/>
